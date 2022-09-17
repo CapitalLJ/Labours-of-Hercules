@@ -50,4 +50,4 @@
 
 学会linux系统的使用，需要做的：
 
--理解 <https://github.com/wang-q/ubuntu/blob/master/README.md> 里的所有内容, 包括所有的 Bash 命令.
+- 理解 <https://github.com/wang-q/ubuntu/blob/master/README.md> 里的所有内容, 包括所有的 Bash 命令.
