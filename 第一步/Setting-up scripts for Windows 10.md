@@ -277,74 +277,9 @@ winget install -s winget -e --id Zotero.Zotero
 
 ## Optional: Rust and C/C++
 
-* [`rust.md`](setup/rust.md)
-
 ## Optional: sysinternals
 
-* Add `$HOME/bin` to Path
-* Open PowerShell as an Administrator
-
-```powershell
-mkdir $HOME/bin
-
-# Add to Path
-[Environment]::SetEnvironmentVariable(
-    "Path",
-    [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine) + ";$HOME\bin",
-    [EnvironmentVariableTarget]::Machine)
-
-```
-
-* Download and extract
-
-```powershell
-scoop install unzip
-
-$array = "DU", "ProcessExplorer", "ProcessMonitor", "RAMMap"
-
-foreach ($app in $array) {
-    aria2c.exe -c "https://download.sysinternals.com/files/$app.zip"
-}
-
-foreach ($app in $array) {
-    unzip "$app.zip" -d $HOME/bin -x Eula.txt
-}
-
-rm $HOME/bin/*.chm
-rm $HOME/bin/*64.exe
-rm $HOME/bin/*64a.exe
-
-```
-
 ## Optional: QuickLook Plugins
-
-<https://github.com/QL-Win/QuickLook/wiki/Available-Plugins>
-
-```powershell
-# epub
-$url = (
-curl.exe -fsSL https://api.github.com/repos/QL-Win/QuickLook.Plugin.EpubViewer/releases/latest |
-    jq -r '.assets[0].browser_download_url'
-)
-curl.exe -LO $url
-
-# office
-$url = (
-curl.exe -fsSL https://api.github.com/repos/QL-Win/QuickLook.Plugin.OfficeViewer/releases/latest |
-    jq -r '.assets[0].browser_download_url'
-)
-curl.exe -LO $url
-
-# folder
-$url = (
-curl.exe -fsSL https://api.github.com/repos/adyanth/QuickLook.Plugin.FolderViewer/releases/latest |
-    jq -r '.assets[0].browser_download_url'
-)
-curl.exe -LO $url
-
-```
-
-Select the `qlplugin` file and press `Spacebar` to install the plugin.
 
 ## Directory Organization
 
