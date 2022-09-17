@@ -44,5 +44,6 @@
 
 - 尽可能详细地记录操作过程，当作实验记录保存下来。
 
-[第一步]()中主要是关于Windows虚拟化环境的调试以及WSL的安装。
+[第一步](https://github.com/CapitalLJ/Labours-of-Hercules/tree/main/%E7%AC%AC%E4%B8%80%E6%AD%A5)中主要是关于Windows虚拟化环境的调试以及WSL的安装。
+
 ### Linux 与 Bash 基础
