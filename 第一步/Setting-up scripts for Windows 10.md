@@ -179,7 +179,7 @@ winget install -e --id Git.Git
 
 ```
 
-You can browse [this page]([Use the winget tool to install and manage applications | Microsoft Learn](https://learn.microsoft.com/zh-cn/windows/package-manager/winget/)) to learn winget.
+You can browse [this page](Use the winget tool to install and manage applications | Microsoft Learn](https://learn.microsoft.com/zh-cn/windows/package-manager/winget/) to learn winget.
 
 Open `Windows Terminal`
 
