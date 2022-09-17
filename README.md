@@ -47,3 +47,7 @@
 [第一步](https://github.com/CapitalLJ/Labours-of-Hercules/tree/main/%E7%AC%AC%E4%B8%80%E6%AD%A5)中主要是关于Windows虚拟化环境的调试以及WSL的安装。
 
 ### Linux 与 Bash 基础
+
+学会linux系统的使用，需要做的：
+
+-理解 <https://github.com/wang-q/ubuntu/blob/master/README.md> 里的所有内容, 包括所有的 Bash 命令.
