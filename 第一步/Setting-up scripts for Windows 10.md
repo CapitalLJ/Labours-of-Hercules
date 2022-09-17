@@ -211,6 +211,7 @@ Log in to the Microsoft Store and get updates from there.
 ## Optional: winget-pkgs
 
 ```powershell
+# You can install what you want.
 # programming 
 # winget install -s winget -e --id AdoptOpenJDK.OpenJDK
 winget install -s winget -e --id Oracle.JavaRuntimeEnvironment
