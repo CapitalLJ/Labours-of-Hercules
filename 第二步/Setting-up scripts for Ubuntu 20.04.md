@@ -59,11 +59,18 @@ You can get 4 IPv4 addresses and 4 IPv6 addresses for user-images.githubusercont
 
 ```
 
+#### install-packages-needed-by-linuxbrew-and-some-others
+
+```bash
+echo "==> When some packages went wrong, check http://mirrors.ustc.edu.cn/ubuntu/ for updating status."
+# echo 打印字符串中的内容
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/1-apt.sh)"
+# bash -c 从字符串中读取命令； curl 在Shell终端界面中基于URL规则进行的文件传输工作 -f:Fail silently (no output at all) on HTTP errors -s:Silent mode -S:Show error even when -s is used -L: --Locatio Follow redirects.
+```
 
 
 
-
-
+[https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/1-apt.sh]() 中的bash命令。
 
 
 
