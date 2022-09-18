@@ -70,7 +70,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/wang-q/ubuntu/master/pre
 
 
 
-[https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/1-apt.sh]() 中的bash命令。
+[https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/1-apt.sh](https://github.com/CapitalLJ/Labours-of-Hercules/blob/main/%E7%AC%AC%E4%BA%8C%E6%AD%A5/1-apt.sh%20.md) 中的bash命令。
 
 
 
