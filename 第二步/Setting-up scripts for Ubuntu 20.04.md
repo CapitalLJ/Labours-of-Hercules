@@ -25,14 +25,10 @@
 
 You can get 4 IPv4 addresses and 4 IPv6 addresses for user-images.githubusercontent.com .
 
-> 		185.199.108.133
-> 		185.199.109.133
-> 		185.199.110.133
-> 		185.199.111.133
-> 		2606:50c0:8000::154
-> 		2606:50c0:8001::154
-> 		2606:50c0:8002::154
-> 		2606:50c0:8003::154
+> 		185.199.108.133	raw.githubusercontent.com
+> 		185.199.109.133	gist.githubusercontent.com
+> 		185.199.110.133	camo.githubusercontent.com
+> 		185.199.111.133	user-images.githubusercontent.com
 
 - Add them to `/etc/hosts` or `C:\Windows\System32\drivers\etc\hosts`
 
