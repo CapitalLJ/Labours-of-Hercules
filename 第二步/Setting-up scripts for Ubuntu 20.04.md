@@ -29,6 +29,7 @@ You can get 4 IPv4 addresses and 4 IPv6 addresses for user-images.githubusercont
 > 		185.199.109.133	gist.githubusercontent.com
 > 		185.199.110.133	camo.githubusercontent.com
 > 		185.199.111.133	user-images.githubusercontent.com
+> 		
 
 - Add them to `/etc/hosts` or `C:\Windows\System32\drivers\etc\hosts`
 
@@ -68,11 +69,75 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/wang-q/ubuntu/master/pre
 
 [https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/1-apt.sh](https://github.com/CapitalLJ/Labours-of-Hercules/blob/main/%E7%AC%AC%E4%BA%8C%E6%AD%A5/1-apt.sh%20.md) 中的bash命令。
 
+#### Optional: adjusting Desktop
+
+In GUI desktop, disable auto updates: `Software & updates -> Updates`, set `Automatically check for updates` to `Never`, untick all checkboxes, click close and click close again.
+
+```shell
+# Removes nautilus bookmarks and disables lock screen
+echo '==> `Ctrl+Alt+T` to start a GUI terminal'
+curl -fsSL https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/2-gnome.sh |
+    bash
+```
+
+[https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/2-gnome.sh]()中的bash命令。
 
 
 
+#### Install Linuxbrew
 
+使用清华的镜像。
 
+```shell Script
+echo "==> Tuna mirrors of Homebrew/Linuxbrew"
+
+<<BLOCK AJDASJ
+BLOCK
+#将变量提升为环境变量，下面为设置环境变量
+export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
+
+# –depth= 1 参数可以使我们只下载当前的最新提交即可
+git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/install.git brew-install
+/bin/bash brew-install/install.sh #从本镜像下载安装脚本并安装 Homebrew / Linuxbrew
+
+rm -rf brew-install
+
+#test -d 检测文件是否存在并且为目录，检测环境变量。
+test -d ~/.linuxbrew && PATH="$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH"
+test -d /home/linuxbrew/.linuxbrew && PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+
+# grep:用于全面搜索的正则表达式，并将结果输出.-i 不区分大小写 -q禁止输出任何结果，已退出状态表示搜索是否成功
+if grep -q -i Homebrew $HOME/.bashrc; then
+    echo "==> .bashrc already contains Homebrew"
+else
+    echo "==> Update .bashrc"
+# 当$HOME/.bashrc不存在新建$HOME/.bashrc。
+# echo >> 输出追加重定向。在文件$HOME/.bashrc后面追加输出内容。
+    echo >> $HOME/.bashrc
+    echo '# Homebrew' >> $HOME/.bashrc
+    
+    
+    echo "export PATH='$(brew --prefix)/bin:$(brew --prefix)/sbin'":'"$PATH"' >> $HOME/.bashrc
+    #定义"$PATH"为环境变量并重输入到$HOME/.bashrc中。
+    
+    echo "export MANPATH='$(brew --prefix)/share/man'":'"$MANPATH"' >> $HOME/.bashrc
+    #定义"$MANPATH"为环境变量并重输入到$HOME/.bashrc中。
+    
+    echo "export INFOPATH='$(brew --prefix)/share/info'":'"$INFOPATH"' >> $HOME/.bashrc
+    #定义"$INFDPATH"为环境变量并重输入到$HOME/.bashrc中。
+    
+    echo "export HOMEBREW_NO_ANALYTICS=1" >> $HOME/.bashrc
+    echo 'export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"' >> $HOME/.bashrc
+    echo 'export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"' >> $HOME/.bashrc
+    echo 'export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"' >> $HOME/.bashrc
+    
+    echo >> $HOME/.bashrc
+fi
+
+source $HOME/.bashrc
+```
 
 
 
