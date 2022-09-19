@@ -91,8 +91,6 @@ curl -fsSL https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/2-gnom
 ```shell Script
 echo "==> Tuna mirrors of Homebrew/Linuxbrew"
 
-<<BLOCK AJDASJ
-BLOCK
 #将变量提升为环境变量，下面为设置环境变量
 export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
 export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
