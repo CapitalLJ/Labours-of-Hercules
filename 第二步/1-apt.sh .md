@@ -46,16 +46,17 @@ sudo mv list.tmp /etc/apt/sources.list
 if [ "$(whoami)" == 'vagrant' ]; then
     echo "==> Disable AppArmor"
     sudo service apparmor stop #关闭apparmor服务
-    sudo update-rc.d -f apparmor remove
+    sudo update-rc.d -f apparmor remove #从所有的运行级别中删除指定启动项
 fi
-#bash在读取或打印变量时，需使用$+变量名，""用于表示变量，''表示字符串。如果当前用户为游客，则关闭AppArmor，
+#bash在读取或打印变量时，需使用$+变量名，""用于表示变量，''表示字符串。如果当前用户为游客，则关闭AppArmor，Apparmor是一个Linux系统安全应用程序。
 
 echo "==> Disable whoopsie"
-sudo sed -i 's/report_crashes=true/report_crashes=false/' /etc/default/whoopsie
-sudo service whoopsie stop
+sudo sed -i 's/report_crashes=true/report_crashes=false/' /etc/default/whoopsie  #修改whoopsie的配置文件
+sudo service whoopsie stop #关闭whoopsie服务，whoopsie是linux出现系统崩溃是的一个报错程序。
 
+#安装一些linuxbrew的依赖包
 echo "==> Install linuxbrew dependences"
-sudo apt-get -y update
+sudo apt-get -y update  #-y 无需系统再次确认，update和upgrad更新并升级apt-pet
 sudo apt-get -y upgrade
 sudo apt-get -y install build-essential curl file git
 sudo apt-get -y install libbz2-dev zlib1g-dev libzstd-dev libexpat1-dev
@@ -90,6 +91,7 @@ sudo apt-get -y install gnuplot graphviz imagemagick
 echo "==> Remove system provided mysql"
 # sudo apt-get -y purge mysql-common
 
+#将系统的sources.list文件还原。
 echo "==> Restore original sources.list"
 if [ -e /etc/apt/sources.list.bak ]; then
     sudo rm /etc/apt/sources.list
