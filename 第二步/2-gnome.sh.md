@@ -1,6 +1,8 @@
 ```shell
 #!/usr/bin/env bash
 
+# 没有选择执行此脚本
+
 # http://superuser.com/questions/244189/bashrc-how-to-know-x-window-is-available-or-not
 # https://unix.stackexchange.com/questions/313338/gnome3-how-do-i-remove-favorites-from-dash-via-terminal
 if [ -n "$DISPLAY" ]; then
