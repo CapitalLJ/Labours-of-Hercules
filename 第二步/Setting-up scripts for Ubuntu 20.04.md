@@ -29,7 +29,7 @@ You can get 4 IPv4 addresses and 4 IPv6 addresses for user-images.githubusercont
 > 		185.199.109.133	gist.githubusercontent.com
 > 		185.199.110.133	camo.githubusercontent.com
 > 		185.199.111.133	user-images.githubusercontent.com
-> 		
+> 
 
 - Add them to `/etc/hosts` or `C:\Windows\System32\drivers\etc\hosts`
 
@@ -91,6 +91,7 @@ curl -fsSL https://raw.githubusercontent.com/wang-q/ubuntu/master/prepare/2-gnom
 ```shell Script
 echo "==> Tuna mirrors of Homebrew/Linuxbrew"
 
+
 #将变量提升为环境变量，下面为设置环境变量
 export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
 export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
@@ -137,6 +138,39 @@ fi
 source $HOME/.bashrc
 ```
 
+在安装时遇到了下述问题，并附上了解决办法。
 
+```bash
+From https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core
+ * [new branch]              master     -> origin/master
+fatal: Could not resolve HEAD to a revision
+Warning: /home/linuxbrew/.linuxbrew/bin is not in your PATH.
+
+#下面为解决办法
+==> Next steps:
+- Run these two commands in your terminal to add Homebrew to your PATH:
+
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/llj/.profile   
+
+#将"$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"写入/home/llj/.profile 文件中
+
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+#eval命令用于重新运算求出参数的内容。
+
+- Run these commands in your terminal to add the non-default Git remotes for Homebrew/brew and Homebrew/homebrew-core:
+
+    echo 'export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"' >> /home/llj/.profile
+    echo 'export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"' >> /home/llj/.profile
+    
+    export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+    export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+    
+    
+- Install Homebrew's dependencies if you have sudo access:
+    sudo apt-get install build-essential
+  For more information, see:
+    https://docs.brew.sh/Homebrew-on-Linux
+
+```
 
 
