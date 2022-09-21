@@ -185,4 +185,21 @@ source $HOME/.bashrc
 #source命令的功能是用于从指定文件中读取和执行命令，通常用于被修改过的文件，使之新参数能够立即生效，而不必重启整台服务器。
 ```
 
-[https://raw.githubusercontent.com/wang-q/dotfiles/master/download.sh]()中的bash命令。
+[https://raw.githubusercontent.com/wang-q/dotfiles/master/download.sh](https://github.com/CapitalLJ/Labours-of-Hercules/blob/main/%E7%AC%AC%E4%BA%8C%E6%AD%A5/download.sh.md)中的bash命令。
+
+
+
+#### Install packages managed by Linuxbrew
+
+Packages include:
+
+- Programming languages: Perl, Python, R, Java, Lua and Node.js
+- Some generalized tools
+
+```bash
+bash $HOME/Scripts/dotfiles/brew.sh
+source $HOME/.bashrc
+```
+
+[$HOME/Scripts/dotfiles/brew.sh]() 中的bash命令。
+
