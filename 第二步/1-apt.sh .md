@@ -6,7 +6,7 @@
 
 echo "====> Install softwares via apt-get <===="
 # apt-get:其功能是用于管理服务软件
-
+#哈啥就是
 echo "==> Disabling the release upgrader禁用发布升级"
 sudo sed -i.bak 's/^Prompt=.*$/Prompt=never/' /etc/update-manager/release-upgrades
 #sed：用于利用语法/脚本对文本文件进行批量的编辑操作。-i.bak: edit files in place (makes backup if SUFFIX supplied).  将目标文件中的"^Prompt=.*$"替换成"Prompt=never"并另存为/etc/update-manager/release-upgrades.bak中。
