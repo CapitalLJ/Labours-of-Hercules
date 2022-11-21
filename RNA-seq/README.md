@@ -180,6 +180,7 @@ rm *.sra
 
 ### 3、测序文件质量控制
 
+### 3.1 质量评估
 拿到测序数据文件，在序列比对之前需要对测序文件的测序质量进行查看，因为不同测序数据来源测序质量也不一样，为了保证后续分析的有效性和可靠性，需要对质量进行评估，如果数据很差那么在后续分析的时候就需要注意了。这里使用fastqc进行质量评估。
 
 ```bash
@@ -202,4 +203,22 @@ fastqc -t 6 -o ../output/fastqc
 cd /mnt/nasLeilingjie/rat_RNASEQ_test/output/fastqc
 multiqc .
 ```
+### 3.2 剔除接头以及测序质量差的碱基
+
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/output
+mkdir -p adapter
+#新建文件夹来存放处理后的文件
+
+cd ../sequence
+parallel -j 4 " cutadapt -a AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT --minimum-length 30 --overlap 4 --trim-n  -o ../output/adapter/{1} {1}" ::: $(ls *.gz)
+# --minimum-length 如果剔除接头后read长度低于30，这条read将会被丢弃
+# --overlap        如果两端的序列与接头有4个碱基的匹配将会被剔除
+# --trim-n         剔除两端的N
+```
+
+### 3.3 再次去除低质量区域
+
+
+
 
