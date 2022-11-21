@@ -100,17 +100,17 @@ mv -i rn6bak.fa rn6.fa
 ```bash
 cat rn6.fa | perl -n -e '
 s/\r?\n//;
-    if(m/^>(.+?)\s*$/){
-        $title = $1;
-        push @t, $title;
-    }elsif(defined $title){
-        $title_len{$title} += length($_);
-     }
-    END{
-        for my $title (@t){
-        print "$title","\t","$title_len{$title}","\n";
-        }
+if(m/^>(.+)/){
+    $title =$1;
+    push @t, $title;
+}elsif(defined $title){
+    $title_len{$title} += length($_);
+}
+END{
+    for my $title (@t){
+       print "$title","\t","$title_len{$title}","\n"; 
     }
+}
 '
 #这里如果有两个read的名称一样会将两个的长度叠加，不过read名称相同本身好像就有点奇怪。
 ```
@@ -138,4 +138,68 @@ cat rn6.fa | perl -n -e '
 
 ```bash
 cd /mnt/nasLeilingjie/rat_RNASEQ_test/annotation
-wget 
+wget http://ftp.ensembl.org/pub/release-104/gff3/rattus_norvegicus/Rattus_norvegicus.Rnor_6.0.104.gff3.gz
+gzip -d Rattus_norvegicus.Rnor_6.0.104.gff3.gz
+mv Rattus_norvegicus.Rnor_6.0.104.gff3 rn6.gff3
+#下载注释文件gff3解压缩改名
+
+
+wget http://ftp.ensembl.org/pub/release-104/gtf/rattus_norvegicus/Rattus_norvegicus.Rnor_6.0.104.gtf.gz
+gzip -d Rattus_norvegicus.Rnor_6.0.104.gtf.gz
+mv Rattus_norvegicus.Rnor_6.0.104.gtf rn6.gtf
+#下载注释文件gtf解压缩改名
+```
+
+### 2.2 下载实验数据(测序文件)
+为了进行演示，从NCBI上查找相关的`RNA-seq`数据进行下载，在GEO数据库中找了一个数据`GSE72960`，对应的SRP数据为`SRP063345`，对应的文献是：
+
+[肝硬化分子肝癌的器官转录组分析和溶血磷脂酸途径抑制 - 《Molecular Liver Cancer Prevention in Cirrhosis by Organ Transcriptome Analysis and Lysophosphatidic Acid Pathway Inhibition》](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5161110/)
+
++ 首先进入站点[NCBI - GEO](https://www.ncbi.nlm.nih.gov/geo)，然后在搜索框中输入`GSE72960`，之后在下方出现了这个基因表达数据集的描述信息，比如样本提交日期，样本文献来源，数据提交人的信息，样本测序样本数量，对应的编号等等。
+
+![](./pic/GEO.png)
+
++ 我们直接点击最下面的`SRA Run selector`这个里面包含了这8个测序样本的测序信息以及文件`SRA编号`，通过这个编号就可以下载测序数据。
+
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/sequence
+prefetch SRR2190795 SRR224018{2..7} SRR2240228
+#将下载好的sra文件放在sequence文件中
+```
+
+下载的文件属于.sra格式，我们需要将其转化为fastq格式的文件，这里还是使用`SRAtoolkit`工具包，但是是里面的`fastq-dump`工具，使用它来进行格式转化
+
+
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/sequence
+ls *.sra | parallel -j 4 " fastq-dump --split-3 --gzip"
+#将sra文件转化为fastq.gz后删除sra文件
+
+rm *.sra
+```
+
+### 3、测序文件质量控制
+
+拿到测序数据文件，在序列比对之前需要对测序文件的测序质量进行查看，因为不同测序数据来源测序质量也不一样，为了保证后续分析的有效性和可靠性，需要对质量进行评估，如果数据很差那么在后续分析的时候就需要注意了。这里使用fastqc进行质量评估。
+
+```bash
+# fastqc [选项] [测序文件]
+
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/sequence
+
+mkdir -p ../output/fastqc
+# -t 指定线程数
+# -o 指定输出文件夹
+
+fastqc -t 6 -o ../output/fastqc
+```
+这里的.html用浏览器打开，查看一下情况，可以看到这个测序质量不是特别好，这里有一篇文章写的可以[用FastQC检查二代测序原始数据的质量](https://www.plob.org/article/5987.html)
+
+> 绿色表示通过，红色表示未通过，黄色表示不太好。一般而言RNA-Seq数据在sequence deplication levels 未通过是比较正常的。毕竟一个基因会大量表达，会测到很多遍。
+这里因为有多份报告，有时候查看不是特别方便，这里有一个将所有的fastqc的检测报告合并到一个文件上的程序`multiqc`
+
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/output/fastqc
+multiqc .
+```
+
