@@ -205,6 +205,8 @@ multiqc .
 ```
 ### 3.2 剔除接头以及测序质量差的碱基
 
+从fastq结果可以看到，在接头那里是显示的通过，但是可以看到有部分是有4个碱基与接头序列匹配的，属于Illumina的通用接头。另外也可以看到，除了可能存在接头的情况，在测序质量那里也可以看到在5'端存在低质量的测序区域，所以像两端这种低质量的区域也是要去除的的，这一步采用trimmomatic进行。
+
 ```bash
 cd /mnt/nasLeilingjie/rat_RNASEQ_test/output
 mkdir -p adapter
@@ -218,6 +220,39 @@ parallel -j 4 " cutadapt -a AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTC
 ```
 
 ### 3.3 再次去除低质量区域
+
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/output
+mkdir trim
+cd adapter
+parallel -j 4 "java -jar ~/biosoft/Trimmomatic-0.38/trimmomatic-0.38.jar SE -phred33 {1} ../trim/{1} LEADING:20 TRAILING:20 SLIDINGWINDOW:5:15 MINLEN:30 " ::: $( ls *.gz)
+# LEADING:20，从序列的开头开始去掉质量值小于 20 的碱基
+# TRAILING:20，从序列的末尾开始去掉质量值小于 20 的碱基
+# SLIDINGWINDOW:5:15，从 5' 端开始以 5bp 的窗口计算碱基平均质量，如果此平均值低于 15，则从这个位置截断read
+# MINLEN:36， 如果 reads 长度小于 30bp 则扔掉整条 read。
+```
+### 3.4 再次查看质量情况
+
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/output/trim
+
+mkdir ../fastqc-trim
+parallel -j 7 "
+fastqc -t 4 -o ../fastqc_trim {1}
+" ::: $(ls *.gz)
+
+cd ../fastqc_trim
+multiqc .
+
+```
+对比接头去除前的情况，可以发现结果明显变好。
+
+### 4 序列比对
+### 4.1 建立索引
+
+这一步使用`hisat2`中的工具`hisat2-build`建立索引。
+
+
 
 
 
