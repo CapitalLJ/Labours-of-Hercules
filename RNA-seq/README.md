@@ -252,7 +252,49 @@ multiqc .
 
 这一步使用`hisat2`中的工具`hisat2-build`建立索引。
 
++ 用法
 
+```
+hisat2-build [选项] [基因组序列(.fa)] [索引文件的前缀名]
+```
+
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/genome
+mkdir index
+cd index
+
+hisat2-build -p 6 ../rn6.chr1.fa rn6.chr1
+# -p 工作线程数
+```
+### 4.2 开始比对
+这里使用hasat2进行比对
+
++ 用法
+
+```bash
+hisat2 [选项] -x [索引文件] [ -1 1测序文件 -2 2测序文件 -U 未成对测序文件 ] [ -S 输出的sam文件 ]
+```
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/output
+mkdir align
+cd trim
+
+parallel -k -j 4 " hisat2 -t -x ../..genome/index/rn6.chr1 -U {1}.fastq.gz -S ../align/{1}.sam 2>../align/{1}.log" ::: $(ls *.gz | perl -p -e 's/.fastq.gz$//')
+# hisat2 -t --tmo 仅报告已知转录组中的比对
+
+```
+比对得到的文件为sam格式文件，SAM格式是目前用来存放大量核酸比对结果信息的通用格式，也是人类能够“直接”阅读的格式类型，而BAM和CRAM是为了方便传输，降低存储压力将SAM进行压缩得到的格式形式。
+
++ 格式转化并排序
+
+```bash
+cd /mnt/nasLeilingjie/rat_RNASEQ_test/output/align
+parallel -k -j 4 "samtools sort -@ 4 {1}.sam > {1}.sort.bam
+samtools index {1}.sort.bam" ::: $(ls *.sam | perl -p -e 's/\.sam$//')
+#-@ 表示线程。在进行比对和格式转化和排序的过程中，最好注意一下电脑的内存情况，不排除由于内存占满随机出错的可能性。
+
+rm *.sam
+```
 
 
 
