@@ -295,7 +295,3 @@ samtools index {1}.sort.bam" ::: $(ls *.sam | perl -p -e 's/\.sam$//')
 
 rm *.sam
 ```
-
-
-
-
