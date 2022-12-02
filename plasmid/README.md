@@ -170,3 +170,30 @@ faops some refseq.fa <(cut -f 1 connected_components.tsv) stdout >> refseq.nr.fa
 mkdir ~/data/plasmid/grouping
 cd ~/data/plasmid/grouping
 
+cat ../nr/refseq.nr.fa | mash sketch -k 21 -s 1000 -i -p 8 - -o refseq.nr.k21s1000.msh
+
+mkdir -p job
+faops size ../nr/refseq.nr.fa |  cut -f 1 | split -l 1000 -a 3 -d - job/
+#将非冗余序列ID分割1000行大小的多个文件。
+
+find job -maxdepth 1 -type f -name "[0-9]??" | sort | 
+parallel -j 4 --line-buffer'
+echo >&2 "==> {}"
+faops some ../nr/refseq.nr.fa {} stdout | mash sketch -k 21 -s 1000 -i -p 6 - -o {}.msh
+'
+#将分割后的文件分别建立草图下一步与总的草图进行比对。
+
+find job -maxdepth 1 -type f -name "[0-9]??" | sort | 
+parallel -j 4 --line-buffer '
+echo >&2 "==> {}"
+mash dist -p 6 {}.msh refseq.nr.k21s1000.msh > {}.tsv
+' 
+# 估计每个查询查询序列到参考的距离。输出的tsv文件数据含义[参考 ID、查询 ID、距离、p 值、共享哈希]。
+
+find job -maxdepth 1 -type f -name "[0-9]??" | sort |
+parallel -j 1 'cat {}.tsv' > dist_full.tsv
+# 将分割后计算好距离的tsv文件汇总
+
+cat dist_full.tsv | tsv-filter --ff-str-ne 1:2 --le 3:0.05 > connected.tsv
+# 筛选出遗传距离小于0.05序列
+```
