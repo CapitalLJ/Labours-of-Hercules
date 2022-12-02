@@ -197,3 +197,36 @@ parallel -j 1 'cat {}.tsv' > dist_full.tsv
 cat dist_full.tsv | tsv-filter --ff-str-ne 1:2 --le 3:0.05 > connected.tsv
 # 筛选出遗传距离小于0.05序列
 ```
+
+mkdir -p group
+cat connected.tsv | perl -nla -F"\t" -MGraph::Undirected -MPath::Tiny -e '
+BEGIN {
+    our $g = Graph::Undirected->new;
+}
+$g->add_edge($F[0], $F[1]);
+END {
+    my @rare;
+    my $serial = 1;
+    my @ccs = $g->connected_components;
+    @ccs = map { $_->[0] }
+        sort { $b->[1] <=> $a->[1] }
+        map { [ $_, scalar( @{$_} ) ] } @ccs;
+    for my $cc ( @ccs ) {
+         my $count = scalar @{$cc};
+         if ($count < 50) {
+                    push @rare, @{$cc};
+                }
+                else {
+                    path(qq{group/$serial.lst})->spew(map {qq{$_\n}} @{$cc});
+                    $serial++;
+                }
+            }
+            path(qq{group/00.lst})->spew(map {qq{$_\n}} @rare);
+
+            path(qq{grouped.lst})->spew(map {qq{$_\n}} $g->vertices);
+}
+'
+
+faops some -i ../nr/refseq.nr.fa grouped.lst stdout | faops size stdin |
+cut -f 1 > group/lonely.lst
+
