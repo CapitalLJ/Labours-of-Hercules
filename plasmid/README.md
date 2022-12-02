@@ -38,7 +38,9 @@ gzip -dcf RefSeq/*.genomic.fna.gz > RefSeq/plasmid.fa
 #将所有的fna文件整合成一个fa文件。
 ```
 
-### MinHash to get non-redundant plasmids
+### MinHash to get non-redundant plasmid
+此部分的思路为将收集到的所有质粒的序列整合到一个fa文件中，按照他们序列的大小进行第一步筛选，除去长度小于2000的序列；在利用mash对长度大于2000的序列进行分析。计算它们的遗传距离，将遗传距离大于0.01的都保留，遗传距离小于0.01的保留其中一个就行。最终得到非冗余质粒序列集合文件refseq.nr.fa
+
 
 ```bash
 mkdir ~/data/plasmid/nr
@@ -118,3 +120,53 @@ find job -maxdepth 1 -type -f -name "[0-9]??" | sort |
 # 估计每个查询序列到参考的距离。 参考和查询都可以是 fasta 或 fastq，压缩或不压缩，或具有匹配 k-mer 大小的 Mash sketch 文件 (.msh)。 查询文件也可以是文件名的文件（见-l）。 默认比较整个文件
 # 输出的tsv文件数据含义[参考 ID、查询 ID、距离、p 值、共享哈希]。
 ```
+
+```bash
+find job -maxdepth 1 -type f -name "[0-9]??" | sort |
+    parallel -j 16 '
+        cat {}.tsv |
+            tsv-filter --ff-str-ne 1:2 --le 3:0.01
+    ' \
+    > redundant.tsv
+# --ff-str-ne 字段与字段的比较，第一列为参考ID、第二列为查询ID；参考ID与查询ID不相等，第三列为距离小于0.01.
+
+```
+
+```bash
+cat redundant.tsv |
+    perl -nla -F"\t" -MGraph::Undirected -e '
+        BEGIN {
+            our $g = Graph::Undirected->new;
+        }
+
+        $g->add_edge($F[0], $F[1]);
+
+        END {
+            for my $cc ( $g->connected_components ) {
+                print join qq{\t}, sort @{$cc};
+            }
+        }
+    ' \
+    > connected_components.tsv
+
+# 此步为将遗传距离小于0.01的序列ID提取出来
+```
+
+```bash
+cat connected_components.tsv | perl -nla -F"\t" -e 'printf qq{%s\n}, $_ for @F' > components.list
+# 将提取出的序列ID转化为列表文件，方便后续的提取
+
+
+faops some -i refseq.fa components.list stdout > refseq.nr.fa
+# 提取序列大于2000的refseq.fa文件中遗传距离大于0.01的序列
+faops some refseq.fa <(cut -f 1 connected_components.tsv) stdout >> refseq.nr.fa
+# 提取序列大于2000的refseq.fa文件中遗传距离小于0.01的序列中的第一个
+```
+
+### Grouping by MinHash
+
+```bash
+
+mkdir ~/data/plasmid/grouping
+cd ~/data/plasmid/grouping
+
