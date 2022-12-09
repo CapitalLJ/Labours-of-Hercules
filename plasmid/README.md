@@ -27,7 +27,7 @@ gzip -dcf RefSeq/*.genomic.gbff.gz > genomic.gbff
 # -c 标准输出 -f force 强制执行
 perl ~/Scripts/withncbi/taxon/gb_taxon_locus.pl genomic.gbff > refseq_id_seq.csv
 rm genomic.gbff
-# 将所有的gbff文件整合到一个文件里面。
+# 将所有的gbff文件提取出来整合到一个文件里面。
 
 gzip -dcf RefSeq/plasmid.1.1.genomic.fna.gz |
     grep "^>" |
@@ -197,7 +197,7 @@ parallel -j 1 'cat {}.tsv' > dist_full.tsv
 cat dist_full.tsv | tsv-filter --ff-str-ne 1:2 --le 3:0.05 > connected.tsv
 # 筛选出遗传距离小于0.05序列
 ```
-
+```bash
 mkdir -p group
 cat connected.tsv | perl -nla -F"\t" -MGraph::Undirected -MPath::Tiny -e '
 BEGIN {
@@ -227,6 +227,9 @@ END {
 }
 '
 
+Graph::Un
 faops some -i ../nr/refseq.nr.fa grouped.lst stdout | faops size stdin |
 cut -f 1 > group/lonely.lst
 
+
+```
