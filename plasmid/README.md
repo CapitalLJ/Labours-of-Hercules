@@ -19,8 +19,9 @@ rsync -avP ftp.ncbi.nlm.nih.gov::refseq/release/plasmid/ RefSeq/
 # -r表示递归、-a参数可以替代-r，除了可以递归同步以外，还可以同步元信息（比如修改时间、权限等）。
 # -P参数是--progress和--partial这两个参数的结合。--partial参数允许恢复中断的传输。不使用该参数时，rsync会删除传输到一半被打断的文件；使用该参数后，传输到一半的文件也会同步到目标目录，下次同步时再恢复中断的传输。一般需要与--append或--append-verify配合使用。
 # -v参数表示输出细节。-vv表示输出更详细的信息，-vvv表示输出最详细的信息。
+```
 [look here]<https://www.ruanyifeng.com/blog/2020/08/rsync.html>
-
+```bash
 gzip -dcf RefSeq/*.genomic.gbff.gz > genomic.gbff
 #gbff文件儲存了基因的基因信息，特徵注釋信息和序列信息。
 
@@ -149,7 +150,7 @@ cat redundant.tsv |
     ' \
     > connected_components.tsv
 
-# 此步为将遗传距离小于0.01的序列ID提取出来
+# 此步为将遗传距离小于0.01的序列ID提取出来按类群提取出来
 ```
 
 ```bash
@@ -197,6 +198,7 @@ parallel -j 1 'cat {}.tsv' > dist_full.tsv
 cat dist_full.tsv | tsv-filter --ff-str-ne 1:2 --le 3:0.05 > connected.tsv
 # 筛选出遗传距离小于0.05序列
 ```
+
 ```bash
 mkdir -p group
 cat connected.tsv | perl -nla -F"\t" -MGraph::Undirected -MPath::Tiny -e '
@@ -227,9 +229,58 @@ END {
 }
 '
 
-Graph::Un
+# MGraph::Undirected
+#将遗传距离小于0.05的质粒按照类群分类得到一个一个的group，并输出一个
+# group中的质粒的ID
+
 faops some -i ../nr/refseq.nr.fa grouped.lst stdout | faops size stdin |
 cut -f 1 > group/lonely.lst
 
+#将不属于任何group的质粒划分到lonely.lst里面。
 
+find group -maxdepth 1 -type f -name "[0-9]*.lst" | sort |
+    parallel -j 4 --line-buffer '
+        echo >&2 "==> {}"
+
+        faops some ../nr/refseq.nr.fa {} stdout |
+            mash sketch -k 21 -s 1000 -i -p 6 - -o {}.msh
+
+        mash dist -p 6 {}.msh {}.msh > {}.tsv
+    '
+# 按照同一group的序列ID提取出来再次进行mash，并将结果,输出到lst.tsv文件中。
+
+find group -maxdepth 1 -type f -name "[0-9]*.lst.tsv" | sort |
+    parallel -j 4 --line-buffer '
+        echo >&2 "==> {}"
+
+        cat {} |
+            tsv-select -f 1-3 |  
+            Rscript -e '\''
+                library(readr);
+                library(tidyr);
+                library(ape);
+                pair_dist <- read_tsv(file("stdin"), col_names=F);
+                tmp <- pair_dist %>%
+                    pivot_wider( names_from = X2, values_from = X3, values_fill = list(X3 = 1.0) )
+                tmp <- as.matrix(tmp)
+                mat <- tmp[,-1]
+                rownames(mat) <- tmp[,1]
+
+                dist_mat <- as.dist(mat)
+                clusters <- hclust(dist_mat, method = "ward.D2")
+                tree <- as.phylo(clusters)
+                write.tree(phy=tree, file="{.}.tree.nwk")
+
+                group <- cutree(clusters, h=0.2) # k=3
+                groups <- as.data.frame(group)
+                groups$ids <- rownames(groups)
+                rownames(groups) <- NULL
+                groups <- groups[order(groups$group), ]
+                write_tsv(groups, "{.}.groups.tsv")
+            '\''
+    '
+    # 
 ```
+
+
+
