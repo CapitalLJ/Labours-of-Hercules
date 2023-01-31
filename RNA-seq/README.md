@@ -169,6 +169,7 @@ prefetch SRR2190795 SRR224018{2..7} SRR2240228
 
 下载的文件属于.sra格式，我们需要将其转化为fastq格式的文件，这里还是使用`SRAtoolkit`工具包，但是是里面的`fastq-dump`工具，使用它来进行格式转化
 
+ls *.sra | parallel -j 4
 
 ```bash
 cd /mnt/nasLeilingjie/rat_RNASEQ_test/sequence

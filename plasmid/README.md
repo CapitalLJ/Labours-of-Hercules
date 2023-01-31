@@ -279,8 +279,43 @@ find group -maxdepth 1 -type f -name "[0-9]*.lst.tsv" | sort |
                 write_tsv(groups, "{.}.groups.tsv")
             '\''
     '
-    # 
+    # 将同一group中的计算好遗传距离后的文件中的前三列信息提取出来
+    # 建树和分成1、2、3的小组
 ```
 
+```bash
+# subgroups
+mkdir -p subgroup
+cp group/lonely.lst subgroup/
+
+find group -name "*.groups.tsv" | sort |
+    parallel -j 1 -k '
+        cat {} | sed -e "1d" | xargs -I[] echo "{/.}_[]"
+    ' |
+    sed -e 's/.lst.groups_/_/' |
+    perl -na -F"\t" -MPath::Tiny -e '
+        path(qq{subgroup/$F[0].lst})->append(qq{$F[1]});
+    '
+
+
+# ignore small subgroups
+find subgroup -name "*.lst" | sort |
+    parallel -j 1 -k '
+        lines=$(cat {} | wc -l)
+
+        if (( lines < 5 )); then
+            echo -e "{}\t$lines"
+            cat {} >> subgroup/lonely.lst
+            rm {}
+        fi
+   '
+# append ccs
+cat ../nr/connected_components.tsv |
+    parallel -j 1 --colsep "\t" '
+        file=$(rg -F -l  "{1}" subgroup)
+        echo {} | tr "[:blank:]" "\n" >> ${file}
+    '
+
+```
 
 
